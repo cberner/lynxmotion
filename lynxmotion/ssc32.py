@@ -29,14 +29,14 @@ class SSC32(object):
         servo: an integer indicating which servo to move
         pulse_width: an integer in [500, 2500], indicating the pulse width to move to
         speed: speed in uS to move at
-        time: the desired time in ms that the move should take"""
+        time: the desired time in seconds that the move should take"""
         assert 500 <= pulse_width <= 2500, pulse_width
         assert 0 <= servo <= 31, servo
 
         command = "#{servo} P{pulse_width}".format(servo=servo, pulse_width=pulse_width)
         if speed:
-            command += " {speed}".format(speed=speed)
+            command += " S{speed}".format(speed=speed)
         if time:
-            command += " {time}".format(time=time)
+            command += " T{time}".format(time=int(1000*time))
         self.write(command)
 
