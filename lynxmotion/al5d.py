@@ -23,11 +23,11 @@ class AL5D(object):
 
     def init(self):
         """Moves all servos to their initial position"""
-        self.ssc32.move(1, 1500)
-        self.ssc32.move(2, 700)
-        self.ssc32.move(3, 1600)
-        self.ssc32.move(5, 1500)
-        self.move(0, 0.2, 0.2)
+        self.base(math.pi / 2)
+        self.shoulder(0)
+        self.elbow(0)
+        self.wrist(0)
+        self.wrist_rotate(0)
         self.gripper(50)
 
     def move(self, x, y, z):
@@ -89,11 +89,11 @@ class AL5D(object):
     def elbow(self, angle, speed=100, time=None):
         """Move the elbow
 
-        angle: the angle to rotate to [0, pi/2], positive angles are counter-clockwise 
+        angle: the angle to rotate to [0, 3pi/4], positive angles are counter-clockwise 
         when viewed from the top of the servo. 0 has the arm fully extended"""
-        assert 0 <= angle <= math.pi / 2, angle
-        percent = angle / (math.pi / 2)
-        self.ssc32.move(ELBOW, int(700 + 700*percent), speed, time)
+        assert 0 <= angle <= 3 * math.pi / 4, angle
+        percent = angle / (3*math.pi / 4)
+        self.ssc32.move(ELBOW, int(700 + 1050*percent), speed, time)
 
     def wrist(self, angle, speed=100, time=None):
         """Move the wrist
