@@ -90,11 +90,11 @@ class AL5D(object):
     def elbow(self, angle, speed=100, time=None):
         """Move the elbow
 
-        angle: the angle to rotate to [0, 3pi/4], positive angles are counter-clockwise 
+        angle: the angle to rotate to [0, 15pi/16], positive angles are counter-clockwise 
         when viewed from the top of the servo. 0 has the arm fully extended"""
-        assert 0 <= angle <= 3 * math.pi / 4, angle
-        percent = angle / (3*math.pi / 4)
-        self.ssc32.move(ELBOW, int(700 + 1050*percent), speed, time)
+        assert 0 <= angle <= 15 * math.pi / 16, angle
+        percent = angle / (15*math.pi / 16)
+        self.ssc32.move(ELBOW, int(700 + 1312.5*percent), speed, time)
 
     def wrist(self, angle, speed=100, time=None):
         """Move the wrist
