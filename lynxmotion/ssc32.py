@@ -3,6 +3,7 @@ import serial
 class SSC32(object):
     def __init__(self, serial_port):
         self.serial = serial.Serial(serial_port, 115200)
+        self.in_group = False
 
     def write(self, string):
         """Sends the given string to the SSC-32 controller.
@@ -38,5 +39,24 @@ class SSC32(object):
             command += " S{speed}".format(speed=speed)
         if time:
             command += " T{time}".format(time=int(1000*time))
-        self.write(command)
+        if self.in_group:
+            self.group += " " + command
+        else:
+            self.write(command)
 
+    def move_group(self):
+        """Returns a context manager for performing several movements as a group
+
+        All calls to .move() in this block, will be executed at the same time"""
+        return self
+
+    def __enter__(self):
+        self.in_group = True
+        self.group = ""
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        if exc_value:
+            raise exc_value, None, traceback
+        self.in_group = False
+        assert self.group, "Empty group"
+        self.write(self.group)

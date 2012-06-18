@@ -18,7 +18,7 @@ ELBOW_WRIST_LENGTH = 0.20955
 
 #XXX: All interpolation is specific to my arm
 class AL5D(object):
-    def __init__(self, serial_port):
+    def __init__(self, serial_port='/dev/ttyUSB0'):
         self.ssc32 = ssc32.SSC32(serial_port)
 
     def init(self):
@@ -33,10 +33,6 @@ class AL5D(object):
     def move(self, x, y, z):
         """Moves the arm to the given coordinate
         x, y, z given in meters"""
-        #Compute the base rotation
-        if x or y:
-            base_angle = math.atan2(y, x)
-            self.base(base_angle)
 
         #Distance from center of base
         d = math.sqrt(x**2 + y**2)
@@ -52,14 +48,19 @@ class AL5D(object):
         #There are two possible solutions (one in which in the elbow is bending "backwards")
         if elbow_theta > 0:
             elbow_theta = math.atan2(-math.sqrt(1 - (numerator / denominator)**2), numerator / denominator)
-        #Our angles are measured the opposite direction
-        self.elbow(-elbow_theta)
 
         #Compute the shoulder angle
         k1 = l1 + l2 * math.cos(elbow_theta)
         k2 = l2 * math.sin(elbow_theta)
         shoulder_theta = math.atan2(z_prime, d) - math.atan2(k2, k1)
-        self.shoulder(math.pi / 2 - shoulder_theta)
+        #Our angles are measured the opposite direction
+        with self.ssc32.move_group():
+            self.elbow(-elbow_theta)
+            self.shoulder(math.pi / 2 - shoulder_theta)
+            #Compute the base rotation
+            if x or y:
+                base_angle = math.atan2(y, x)
+                self.base(base_angle)
 
     def gripper(self, percent, speed=100, time=None):
         """Open/close the gripper
