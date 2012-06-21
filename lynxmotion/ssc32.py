@@ -24,6 +24,10 @@ class SSC32(object):
         self.write("VER")
         return self.readline()
 
+    def move_done(self):
+        self.write("Q")
+        return self.serial.read() == "."
+
     def move(self, servo, pulse_width, speed=None, time=None):
         """Moves the given servo.
 

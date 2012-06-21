@@ -1,5 +1,6 @@
 import ssc32
 import math
+import time
 
 BASE = 0
 SHOULDER = 1
@@ -23,12 +24,13 @@ class AL5D(object):
 
     def init(self):
         """Moves all servos to their initial position"""
-        self.base(math.pi / 2)
-        self.shoulder(0)
-        self.elbow(0)
-        self.wrist(0)
-        self.wrist_rotate(0)
-        self.gripper(50)
+        with self.ssc32.move_group():
+            self.base(math.pi / 2)
+            self.shoulder(0)
+            self.elbow(0)
+            self.wrist(0)
+            self.wrist_rotate(0)
+            self.gripper(50)
 
     def move(self, x, y, z):
         """Moves the arm to the given coordinate
@@ -61,6 +63,15 @@ class AL5D(object):
             if x or y:
                 base_angle = math.atan2(y, x)
                 self.base(base_angle)
+
+    def move_done(self):
+        return self.ssc32.move_done()
+
+    def wait_for_move(self):
+        """Blocks until the current movement is finished"""
+        while not self.move_done():
+            #Empirical testing suggests that we can't poll more often than 1ms
+            time.sleep(0.001)
 
     def gripper(self, percent, speed=100, time=None):
         """Open/close the gripper
