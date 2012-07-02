@@ -2,7 +2,7 @@ import drawing
 import itertools
 import random
 
-LINE_HEIGHT = 0.03
+LINE_HEIGHT = 0.02
 LINE_SPACING = 0.02
 TOP_OF_BOARD = 0.25
 
