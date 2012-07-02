@@ -29,6 +29,27 @@ class Board(object):
     def is_gameover(self):
         return all(itertools.chain(*self._state))
 
+class PhysicalBoard(Board):
+    def __init__(self, size=1):
+        super(PhysicalBoard, self).__init__(size)
+        self.drawing = drawing.Drawing()
+        
+        for row in range(size):
+            row_width = LINE_SPACING * row
+            for line in range(row + 1):
+                x = line * LINE_SPACING - row_width / 2.0
+                y = TOP_OF_BOARD - row * LINE_HEIGHT * 1.5
+                self.drawing.line(x, y, x, y - LINE_HEIGHT)
+
+    def move(self, row, col_start, col_end):
+        super(PhysicalBoard, self).move(row, col_start, col_end)
+        
+        row_width = LINE_SPACING * row
+        y = TOP_OF_BOARD - LINE_HEIGHT / 2.0 - row*LINE_HEIGHT*1.5
+        x_start = col_start * LINE_SPACING - row_width / 2.0 - LINE_SPACING / 2.0
+        x_end = col_end * LINE_SPACING - row_width / 2.0 + LINE_SPACING / 2.0
+        self.drawing.line(x_start, y, x_end, y)
+
 class UI(object):
     def init(self, board):
         pass
@@ -54,14 +75,13 @@ class TerminalUI(UI):
         self._draw_board(board)
         inp = raw_input("Input move: [row],[col start],[lines to cross out]")
         row, col_start, lines = inp.split(',')
-        board.move(int(row), int(col_start), int(col_start) + int(lines) - 1)
-        return board
+        return (int(row), int(col_start), int(col_start) + int(lines) - 1)
     
     def ai_move(self, move, board):
         self._draw_board(board)
         num_lines = move[2] - move[1] + 1
         print "AI crossed out {num} line{plural} on row {row} starting at column {col}".format(
-                row=move[0], col=move[1], num=num_lines, plural='s' if num_lines > 1 else '') 
+                row=move[0], col=move[1], num=num_lines, plural='s' if num_lines > 1 else '')
 
 class PhysicalUI(UI):
     def __init__(self):
@@ -91,13 +111,14 @@ class RandomStrategy(Strategy):
 
 class GameController(object):
     def __init__(self):
-        self.board = Board(3)
+        self.board = PhysicalBoard(3)
         self.strategy = RandomStrategy()
         self.ui = TerminalUI()
 
     def run(self):
         while True:
-            self.board = self.ui.get_player_move(self.board)
+            player_move = self.ui.get_player_move(self.board)
+            self.board.move(*player_move)
             if self.board.is_gameover():
                 print "You win"
                 break
