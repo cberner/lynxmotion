@@ -27,7 +27,6 @@ class Drawing(object):
         #Parameterize x and y in terms of t
         slope_x = (end_x - start_x) / num_steps
         slope_y = (end_y - start_y) / num_steps
-        print 'taking {0} steps'.format(num_steps)
         for t in range(num_steps):
             self.al5d.move(start_x + t*slope_x, start_y + t*slope_y, HEIGHT)
             self.al5d.wait_for_move()
