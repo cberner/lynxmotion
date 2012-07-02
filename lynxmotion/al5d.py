@@ -15,7 +15,9 @@ SHOULDER_HEIGHT = 0.06985
 #Measured from servo centers, in meters
 SHOULDER_ELBOW_LENGTH = 0.14605
 #Measured from servo centers, in meters
-ELBOW_WRIST_LENGTH = 0.20955
+#ELBOW_WRIST_LENGTH = 0.20955
+#XXX: Including gripper length, since we only support two joint IK, atm
+ELBOW_WRIST_LENGTH = 0.27305
 
 #XXX: All interpolation is specific to my arm
 class AL5D(object):
@@ -101,11 +103,11 @@ class AL5D(object):
     def elbow(self, angle, speed=100, time=None):
         """Move the elbow
 
-        angle: the angle to rotate to [0, 15pi/16], positive angles are counter-clockwise 
+        angle: the angle to rotate to [0, 7pi/8], positive angles are counter-clockwise 
         when viewed from the top of the servo. 0 has the arm fully extended"""
-        assert 0 <= angle <= 15 * math.pi / 16, angle
-        percent = angle / (15*math.pi / 16)
-        self.ssc32.move(ELBOW, int(700 + 1312.5*percent), speed, time)
+        assert 0 <= angle <= math.pi * 7.0 / 8.0, angle
+        percent = angle / math.pi
+        self.ssc32.move(ELBOW, int(660 + 1560*percent), speed, time)
 
     def wrist(self, angle, speed=100, time=None):
         """Move the wrist
