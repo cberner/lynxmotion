@@ -15,9 +15,9 @@ SHOULDER_HEIGHT = 0.06985
 #Measured from servo centers, in meters
 SHOULDER_ELBOW_LENGTH = 0.14605
 #Measured from servo centers, in meters
-#ELBOW_WRIST_LENGTH = 0.20955
-#XXX: Including gripper length, since we only support two joint IK, atm
-ELBOW_WRIST_LENGTH = 0.27305
+ELBOW_WRIST_LENGTH = 0.20955
+#Measured from wrist servo center to tip of gripper
+WRIST_ENDPOINT_LENGTH = 0.100013
 
 #XXX: All interpolation is specific to my arm
 class AL5D(object):
@@ -34,14 +34,22 @@ class AL5D(object):
             self.wrist_rotate(0)
             self.gripper(50)
 
-    def move(self, x, y, z):
-        """Moves the arm to the given coordinate
-        x, y, z given in meters"""
-
+    def move(self, x, y, z, phi):
+        """Moves the end point of the gripper to the given x,y,z coordinate,
+        with angle phi relative xy plane (positive is clockwise when 
+        viewed looking down the wrist servo)"""
+        
         #Distance from center of base
         d = math.sqrt(x**2 + y**2)
         #Height above shoulder joint
         z_prime = z - SHOULDER_HEIGHT
+
+        #To implement 3-joint IK, we use the equation for 2-joint for the wrist,
+        #since the endpoint position with angle, defines that.
+
+        #Adjust d and z_prime to be the wrist position
+        d -= math.cos(phi)*WRIST_ENDPOINT_LENGTH
+        z_prime -= math.sin(phi)*WRIST_ENDPOINT_LENGTH
 
         l1 = SHOULDER_ELBOW_LENGTH
         l2 = ELBOW_WRIST_LENGTH
@@ -57,10 +65,12 @@ class AL5D(object):
         k1 = l1 + l2 * math.cos(elbow_theta)
         k2 = l2 * math.sin(elbow_theta)
         shoulder_theta = math.atan2(z_prime, d) - math.atan2(k2, k1)
+        wrist_theta = phi - shoulder_theta - elbow_theta
         #Our angles are measured the opposite direction
         with self.ssc32.move_group():
             self.elbow(-elbow_theta)
             self.shoulder(math.pi / 2 - shoulder_theta)
+            self.wrist(-wrist_theta)
             #Compute the base rotation
             if x or y:
                 base_angle = math.atan2(y, x)
