@@ -4,7 +4,7 @@ import random
 
 LINE_HEIGHT = 0.02
 LINE_SPACING = 0.02
-TOP_OF_BOARD = 0.25
+TOP_OF_BOARD = 0.275
 
 class Board(object):
     def __init__(self, size=1):
@@ -130,6 +130,13 @@ class GameController(object):
                 break
 
 if __name__ == "__main__":
+    inp = raw_input("Place_pen? (y/n)")
+    d = drawing.Drawing()
+    if inp.startswith("y"):
+        d.init()
+        inp = raw_input("Press enter when done")
+    d.grip_pen()
+
     controller = GameController()
     controller.run()
 

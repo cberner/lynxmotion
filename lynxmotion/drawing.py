@@ -2,9 +2,9 @@ import al5d
 import math
 
 #Gripper height when drawing
-HEIGHT = -0.01
+HEIGHT = -0.026
 #Gripper angle when drawing
-PHI = -math.pi / 8
+PHI = -math.pi / 5
 
 class Drawing(object):
     def __init__(self, serial_port='/dev/ttyUSB0'):
@@ -16,7 +16,13 @@ class Drawing(object):
         print "Please place the pen"
 
     def grip_pen(self):
-        self.al5d.gripper(78)
+        self.al5d.gripper(72)
+
+    def rect(self, upper_left, lower_right):
+        self.line(upper_left[0], upper_left[1], lower_right[0], upper_left[1])
+        self.line(lower_right[0], upper_left[1], lower_right[0], lower_right[1])
+        self.line(lower_right[0], lower_right[1], upper_left[0], lower_right[1])
+        self.line(upper_left[0], lower_right[1], upper_left[0], upper_left[1])
 
     def line(self, start_x, start_y, end_x, end_y):
         self.al5d.move(0, 0.2, 0.1, PHI)

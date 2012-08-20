@@ -29,7 +29,7 @@ class AL5D(object):
         with self.ssc32.move_group():
             self.base(math.pi / 2)
             self.shoulder(0)
-            self.elbow(0)
+            self.elbow(math.pi / 2)
             self.wrist(0)
             self.wrist_rotate(0)
             self.gripper(50)
@@ -124,9 +124,9 @@ class AL5D(object):
 
         angle: the angle to rotate to [-pi/4, pi/4], positive angles are counter-clockwise 
         when viewed from the top of the servo. 0 is fully extended"""
-        assert -math.pi / 4 <= angle <= math.pi / 4, angle
-        percent = angle / (math.pi / 4)
-        self.ssc32.move(WRIST, int(1550 - 400*percent), speed, time)
+        assert -math.pi / 3 <= angle <= math.pi / 3, angle
+        percent = angle / (math.pi / 2)
+        self.ssc32.move(WRIST, int(1550 - 800*percent), speed, time)
 
     def wrist_rotate(self, angle, speed=100, time=None):
         """Rotate the wrist
