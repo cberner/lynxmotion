@@ -14,8 +14,13 @@ WRIST_ROTATE = 5
 SHOULDER_HEIGHT = 0.06985
 #Measured from servo centers, in meters
 SHOULDER_ELBOW_LENGTH = 0.14605
+
 #Measured from servo centers, in meters
-ELBOW_WRIST_LENGTH = 0.20955
+#Longer arm
+#ELBOW_WRIST_LENGTH = 0.20955
+#Shorter arm)
+ELBOW_WRIST_LENGTH = 0.1143
+
 #Measured from wrist servo center to tip of gripper
 WRIST_ENDPOINT_LENGTH = 0.100013
 
@@ -133,9 +138,10 @@ class AL5D(object):
 
         angle: the angle to rotate to [-pi/4, pi/4], positive angles are counter-clockwise 
         when viewed looking into the gripper"""
-        assert -math.pi / 4 <= angle <= math.pi / 4, angle
-        percent = angle / (math.pi / 4)
-        self.ssc32.move(WRIST_ROTATE, int(1450 + 500*percent), speed, time)
+        #The gripper has extra rotational room on the positive side
+        assert 0 <= angle <= math.pi, angle
+        percent = angle / (math.pi)
+        self.ssc32.move(WRIST_ROTATE, int(650 + 1820*percent), speed, time)
 
 
 
